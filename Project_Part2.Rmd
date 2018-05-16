@@ -1,0 +1,81 @@
+---
+title: "Basic Statistical Inference"
+author: "Lukasz Konczyk"
+date: "30 kwietnia 2018"
+output: pdf_document
+---
+
+##Part Two
+
+In this part of Statistical Inference Coursera project, we will focus on basic statistical inference in data. Please look at the dataset, which we will analise, from R help:
+
+*The response is the length of odontoblasts (cells responsible for tooth growth) in 60 guinea pigs. Each animal received one of three dose levels of vitamin C (0.5, 1, and 2 mg/day) by one of two delivery methods, orange juice or ascorbic acid (a form of vitamin C and coded as VC).*
+
+
+###Data loading
+
+Now, we load data and look at summary.
+
+```{r, echo=TRUE}
+library(datasets)
+data(ToothGrowth)
+summary(ToothGrowth)
+str(ToothGrowth)
+dim(ToothGrowth)
+```
+
+We will compare length of tooth growth in comparision groups: supp and dose. Firstly, we must transform variable dose to factor.
+
+```{r, echo=TRUE}
+ToothGrowth$dose<-as.factor(ToothGrowth$dose)
+summary(ToothGrowth)
+```
+
+###Data analysis
+
+As in data we have tooth growth for 60 different guinea pigs, to compare impact of dose or supplier in group, we must use t test for independent groups. T test compares means between group.
+
+Before we apply statistical tests, we prepare some basic plots.
+
+```{r, echo=TRUE,fig.height = 4, fig.width = 5}
+par(mfrow=c(1,2))
+boxplot(ToothGrowth$len~ToothGrowth$supp, main="Tooth Growth for guinea pigs\n in supplier groups",cex.main=0.7)
+
+boxplot(ToothGrowth$len~ToothGrowth$dose, main="Tooth Growth for guinea pigs\n in dose groups", cex.main=0.7)
+```
+
+Looking at first plot, we may state, that there is no influence between supply way of vitamin C. But if we look at second plot, we may conclude that there is dependancy between tooth growth and dose. So, we check our hypothesis. Firstly we check supply way.
+
+```{r, echo=TRUE}
+t.test(ToothGrowth$len~ToothGrowth$supp)
+```
+
+T test p-value is larger than 5%. Also t test confidence interval contains 0. This confirms that there is no effect between two supply way. Now have look at dose. As we have 3 dose, we can compare only two groups and we must do 3 tests.
+
+```{r, echo=TRUE}
+ToothGrowth_0.5_1<-subset(ToothGrowth, dose!=2)
+t.test(ToothGrowth_0.5_1$len~ToothGrowth_0.5_1$dose)
+```
+
+Looking at this test, we see that p-value is significant lower than 5% and confidence interval doesn't contain 0, so there is difference in tooth growth by dose 0.5 and 1.
+
+```{r, echo=TRUE}
+ToothGrowth_0.5_2<-subset(ToothGrowth, dose!=1)
+t.test(ToothGrowth_0.5_2$len~ToothGrowth_0.5_2$dose)
+```
+
+Looking at this test, we see that p-value is significant lower than 5% and confidence interval doesn't contain 0, so there is difference in tooth growth by dose 0.5 and 2.
+
+```{r, echo=TRUE}
+ToothGrowth_1_2<-subset(ToothGrowth, dose!=0.5)
+t.test(ToothGrowth_1_2$len~ToothGrowth_1_2$dose)
+```
+
+Looking at this test, we see that p-value is significant lower than 5% and confidence interval doesn't contain 0, so there is difference in tooth growth by dose 1 and 2.
+
+###Summary
+
+Looking overall at analysis, we can deduce following proposals:
+
+1. Supply way doesn't influence on tooth growth guinei pigs.
+2. There is significant dependancy between dose tooth growth of guinei pigs - larger dose cause bigger tooth growth.
